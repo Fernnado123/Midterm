@@ -1,52 +1,82 @@
-# Prerequisites
-*.d
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
 
-# Object files
-*.o
-*.ko
-*.obj
-*.elf
+// Function to calculate the total cost of tickets
+float calculate_ticket_cost(int age, bool is_blockbuster, bool is_premium, char movie_time[]) {
+    int regular_prices[] = {5, 10, 7};
+    int premium_price = 3;
+    int discount = (strcmp(movie_time, "5:00PM") < 0) ? 2 : 0;
+    int blockbuster_surcharge = (is_blockbuster) ? 5 : 0;
+    float ticket_price = 0.0;
 
-# Linker output
-*.ilk
-*.map
-*.exp
+    if (age <= 12) {
+        ticket_price = regular_prices[0] - discount + blockbuster_surcharge;
+    } else if (age >= 13 && age <= 59) {
+        ticket_price = regular_prices[1] - discount + blockbuster_surcharge;
+    } else {
+        ticket_price = regular_prices[2] - discount + blockbuster_surcharge;
+    }
 
-# Precompiled Headers
-*.gch
-*.pch
+    if (is_premium) {
+        ticket_price += premium_price;
+    }
 
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
+    return ticket_price;
+}
 
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
+int main() {
+    char movies[3][50] = {
+            "Five Nights at Freddy’s",
+            "Freelance",
+            "The Marvels"
+    };
 
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
+    char timings[3][50][10] = {
+            {"12:35PM", "1:45PM", "3:10PM", "5:45PM"},
+            {"4:15PM"},
+            {"2:00PM", "2:30PM", "3:00PM", "3:30PM"}
+    };
 
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
+    // Display movie schedule
+    printf("*********************Welcome to Cinemark Theaters********************\n");
+    printf("--------------------------Movie-------------------------|------------------------Time-----------------\n");
+    for (int i = 0; i < 3; ++i) {
+        printf("%s%s", movies[i], "| ");
+        for (int j = 0; j < sizeof(timings[i]) / sizeof(timings[i][0]); ++j) {
+            printf("%s%s", timings[i][j], ", ");
+        }
+        printf("\n");
+    }
+    printf("------------------------------------------------------------------------------------------------------------\n");
 
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
+    // User input
+    int user_age;
+    char chosen_movie[50];
+    char chosen_time[10];
+    char is_blockbuster;
+    char is_premium_seating;
+    printf("Enter your age: ");
+    scanf("%d", &user_age);
+    printf("Enter the movie you would like to watch: ");
+    scanf("%s", chosen_movie);
+    printf("Enter the time of the movie: ");
+    scanf("%s", chosen_time);
+    printf("Is the movie a blockbuster? (Y/N): ");
+    scanf(" %c", &is_blockbuster);
+    printf("Do you prefer premium seating? (Y/N): ");
+    scanf(" %c", &is_premium_seating);
+
+    bool is_blockbuster_movie = (is_blockbuster == 'Y' || is_blockbuster == 'y');
+    bool is_premium_seating_choice = (is_premium_seating == 'Y' || is_premium_seating == 'y');
+
+    float total_cost = calculate_ticket_cost(user_age, is_blockbuster_movie, is_premium_seating_choice, chosen_time);
+
+    // Display total cost
+    printf("Total cost for viewing %s with %s and being a blockbuster movie%s $%.2f.\n",
+           chosen_movie, (is_premium_seating_choice) ? "premium seating" : "regular seating",
+           (is_blockbuster_movie) ? "" : " is", total_cost);
+    printf("Thank you for visiting Cinemark Theaters!\n");
+
+    return 0;
+}
